@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Exemplo de localStorage com Imagens</title>
+    <!-- Link do Bootstrap -->
+    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #e0f7fa; /* Tom de azul claro para o fundo */
+            padding: 20px;
+        }
+        h1, h2 {
+            color: #007bff; /* Azul escuro para os títulos */
+        }
+        .product-input {
+            margin-bottom: 10px;
+        }
+        .product-item img {
+            width: 50px;
+            height: auto;
+            margin-right: 10px;
+        }
+        .btn-primary {
+            background-color: #66b2ff; /* Azul claro para o botão de adicionar */
+            border-color: #3399ff;
+        }
+        .btn-danger {
+            background-color: #ff6666; /* Vermelho claro para o botão de remover */
+            border-color: #ff3333;
+        }
+        .list-group-item {
+            background-color: #e6f2ff; /* Tom de azul claro para os itens da lista */
+            color: #003366; /* Azul marinho para o texto dos itens */
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1 class="text-center">Lista de Compras com Imagens</h1>
+        <div class="input-group product-input">
+            <input type="text" id="productInput" class="form-control" placeholder="Adicionar produtos">
+            <input type="text" id="imageInput" class="form-control" placeholder="URL da imagem">
+            <div class="input-group-append">
+                <button id="addButton" class="btn btn-primary">Adicionar</button>
+            </div>
+        </div>
+        
+        <h2>Produtos:</h2>
+        <ul id="productList" class="list-group"></ul>
+        
+        <button id="removeAllButton" class="btn btn-danger mt-3">Remover Todos</button>
+    </div>
+
+    <script>
+        // Função para carregar os produtos armazenados no localStorage
+        function loadProducts() {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            const productList = document.getElementById('productList');
+            productList.innerHTML = ''; // Limpa a lista antes de adicionar
+
+            // Adiciona cada produto à lista na página
+            products.forEach((product, index) => {
+                const listItem = document.createElement('li');
+                listItem.className = 'list-group-item d-flex align-items-center product-item';
+
+                // Adiciona a imagem
+                const img = document.createElement('img');
+                img.src = product.image;
+                img.alt = product.name;
+
+                // Adiciona o nome do produto
+                const name = document.createElement('span');
+                name.textContent = product.name;
+
+                // Botão de remover
+                const removeButton = document.createElement('button');
+                removeButton.textContent = 'Remover';
+                removeButton.className = 'btn btn-danger btn-sm ml-auto';
+                removeButton.onclick = () => removeProduct(index);
+
+                // Adiciona a imagem e o nome ao item da lista
+                listItem.appendChild(img);
+                listItem.appendChild(name);
+                listItem.appendChild(removeButton);
+                productList.appendChild(listItem);
+            });
+        }
+
+        // Função para adicionar um novo produto
+        function addProduct() {
+            const productInput = document.getElementById('productInput');
+            const imageInput = document.getElementById('imageInput');
+            const productName = productInput.value.trim();
+            const imageUrl = imageInput.value.trim();
+
+            if (productName && imageUrl) {
+                const products = JSON.parse(localStorage.getItem('products')) || [];
+                products.push({ name: productName, image: imageUrl });
+                localStorage.setItem('products', JSON.stringify(products));
+                productInput.value = '';
+                imageInput.value = '';
+                loadProducts();
+            } else {
+                alert("Por favor, insira um nome de produto e uma URL de imagem.");
+            }
+        }
+
+        // Função para remover um produto
+        function removeProduct(index) {
+            const products = JSON.parse(localStorage.getItem('products')) || [];
+            products.splice(index, 1);
+            localStorage.setItem('products', JSON.stringify(products));
+            loadProducts();
+        }
+
+        // Função para remover todos os produtos
+        function removeAllProducts() {
+            localStorage.removeItem('products');
+            loadProducts();
+        }
+
+        // Função para pré-carregar produtos ao inicializar a página
+        function preloadProducts() {
+            const preloadedProducts = [
+                { name: 'Silicone', image: 'imagens/silicone.jpeg' },
+                { name: 'Banana', image: 'imagens/banana.jpeg' },
+                { name: 'Mc brinquedo', image: 'imagens/mcbrinquedo.jpeg' }
+            ];
+
+            if (!localStorage.getItem('products')) {
+                localStorage.setItem('products', JSON.stringify(preloadedProducts));
+            }
+            loadProducts();
+        }
+
+        // Adiciona o evento de clique ao botão de adicionar
+        document.getElementById('addButton').addEventListener('click', addProduct);
+
+        // Adiciona o evento de clique ao botão de remover todos
+        document.getElementById('removeAllButton').addEventListener('click', removeAllProducts);
+
+        // Carrega os produtos ao inicializar a página
+        preloadProducts();
+    </script>
+    <!-- Script do Bootstrap -->
+    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
+    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
+</body>
+</html>
